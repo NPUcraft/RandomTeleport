@@ -1,0 +1,32 @@
+name: RandomTeleport
+version: ${project.version}
+main: com.npucraft.randomteleport.RandomTeleportPlugin
+api-version: '1.20'
+authors: [NPUCraft]
+website: https://npucraft.com
+description: Random safe RTP (EN/ZH), Vault/CoinsEngine, border, delay, back, PAPI.
+
+softdepend: [Vault, CoinsEngine, PlaceholderAPI]
+
+commands:
+  rtp:
+    description: Random teleport, back, help, or reload config.
+    usage: /<command> [reload|back|help]
+    aliases: [randomtp, randomteleport]
+
+permissions:
+  randomteleport.use:
+    description: Use /rtp and /rtp help
+    default: true
+  randomteleport.back:
+    description: Use /rtp back
+    default: true
+  randomteleport.bypass.cooldown:
+    description: Ignore RTP cooldown
+    default: op
+  randomteleport.bypass.cost:
+    description: Ignore RTP and /rtp back economy charges (Vault or CoinsEngine)
+    default: op
+  randomteleport.admin.reload:
+    description: Use /rtp reload
+    default: op

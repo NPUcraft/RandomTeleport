@@ -1,0 +1,228 @@
+# 修改后执行 /rtp reload（需 randomteleport.admin.reload）或重启服务端
+#
+# --- 根配置 ---
+# debug: 控制台是否输出调试 INFO
+# cooldown-seconds: 两次成功 RTP 之间的间隔（秒）；权限 randomteleport.bypass.cooldown 可跳过
+# max-location-attempts: 单次 /rtp 最多随机尝试次数（每次可能加载区块，不宜过大）
+# max-sync-chunk-loads-per-rtp: 单次搜索最多同步加载多少个未加载区块（控制主线程卡顿）；不写则默认 min(32, max-location-attempts)；0 = 不限制（易卡顿）
+# teleport-delay-ticks: 找到落点后等待刻数（约 20 ticks = 1 秒）；0 为立即传送；移动/受伤会取消
+# delay-cancel-move-blocks: 延迟期间允许水平移动超过此值则取消（同世界）
+# min-blocks-from-other-players: 与其他玩家的最小距离（格），0 表示不检查
+# respect-world-border: true 时随机范围会与当前世界边界求交
+# world-border-margin: 落点距边界至少向内留出的格数
+# language: auto | zh | en；auto 按客户端语言 zh_* 选中文否则英文
+# fallback-language: 控制台等非玩家发送者使用的语言（勿用 auto）
+debug: false
+cooldown-seconds: 30
+max-location-attempts: 48
+max-sync-chunk-loads-per-rtp: 32
+teleport-delay-ticks: 100
+delay-cancel-move-blocks: 0.35
+min-blocks-from-other-players: 16
+respect-world-border: true
+world-border-margin: 2.0
+language: auto
+fallback-language: en
+
+# --- 经济 ---
+# provider: auto（优先 Vault，否则 CoinsEngine）| vault | coinsengine
+# enabled: false 时不扣费；currency-id 仅 CoinsEngine 需要，须与货币 ID 一致
+# cost / cost-nether / cost-end: 各维度 RTP 价格；未写的维度继承 cost
+# cost-back / cost-back-*: /rtp back 价格；未写 cost-back 时与 cost 相同；未写某维度则继承 cost-back
+economy:
+  enabled: true
+  provider: coinsengine
+  currency-id: coins
+  cost: 100
+  cost-nether: 200
+  cost-end: 300
+  cost-back: 100
+
+# --- 安全 --- 在岩浆、火等之外，是否把下列方块视为不安全落脚点
+safety:
+  avoid-water: true
+  avoid-webs: true
+  avoid-cave-vines: true
+  avoid-dripstone: true
+
+# --- 世界 --- mode: all | whitelist | blacklist；list 为世界名（不区分大小写）
+# 例 whitelist: list: [world, world_nether]
+worlds:
+  mode: all
+  list: []
+
+# --- 效果 --- enabled: 总开关；Sound 为 Bukkit Sound 枚举名
+# repeat-countdown-title: 延迟期间是否每刻刷新倒计时标题（与 teleport-delay-ticks 配合）
+# countdown: 可用 {seconds} {ticks}；success: 可用 {x} {y} {z}
+effects:
+  enabled: true
+  repeat-countdown-title: true
+  searching:
+    enabled: true
+    sound: BLOCK_NOTE_BLOCK_PLING
+    volume: 0.35
+    pitch: 1.25
+    title: ""
+    subtitle: ""
+    fade-in: 0
+    stay: 0
+    fade-out: 0
+  countdown:
+    enabled: true
+    sound: BLOCK_NOTE_BLOCK_HAT
+    volume: 0.2
+    pitch: 1.0
+    title: "&e{seconds}s"
+    subtitle: "&7Do not move"
+    fade-in: 0
+    stay: 22
+    fade-out: 5
+  success:
+    enabled: true
+    sound: ENTITY_ENDERMAN_TELEPORT
+    volume: 0.5
+    pitch: 1.1
+    title: "&aRTP"
+    subtitle: "&fx: {x} y: {y} z: {z}"
+    fade-in: 5
+    stay: 35
+    fade-out: 10
+  failed:
+    enabled: true
+    sound: ENTITY_VILLAGER_NO
+    volume: 0.4
+    pitch: 1.0
+    title: "&cRTP"
+    subtitle: "&7No safe spot"
+    fade-in: 5
+    stay: 30
+    fade-out: 10
+  delay-cancel:
+    enabled: true
+    sound: BLOCK_NOTE_BLOCK_BASS
+    volume: 0.4
+    pitch: 0.8
+    title: "&cCancelled"
+    subtitle: "&7Moved or took damage"
+    fade-in: 5
+    stay: 25
+    fade-out: 10
+  reload:
+    enabled: true
+    sound: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.3
+    pitch: 1.2
+    title: "&aReloaded"
+    subtitle: ""
+    fade-in: 5
+    stay: 25
+    fade-out: 10
+
+# --- 随机范围 --- 按维度 inclusive XZ；若 respect-world-border 为 true 会与边界再求交
+ranges:
+  overworld:
+    min-x: -20000
+    max-x: 20000
+    min-z: -20000
+    max-z: 20000
+  nether:
+    min-x: -5000
+    max-x: 5000
+    min-z: -5000
+    max-z: 5000
+  the_end:
+    min-x: -20000
+    max-x: 20000
+    min-z: -20000
+    max-z: 20000
+
+# --- 消息 --- & 为颜色码；delay-actionbar: {seconds} {ticks} {cost_detail}
+# reload-failed: /rtp reload 解析或应用配置失败时提示（详情见控制台）
+# reload-rtp-cancelled: /rtp reload 时若玩家正在延迟传送，会取消并发送此提示
+# help-no-worlds: 留空或未写则使用对应语言内置提示
+# success / back-success 中 {paid} 由 success-paid、back-success-paid 拼接（免费时为空）
+# help-line-* 可写多行；占位符 {world} {dim} {rtp} {back} {minx} {maxx} {minz} {maxz}
+# help-no-permission 为空则沿用 no-permission
+messages:
+  zh:
+    prefix: "&7[&b随机传送&7] &r"
+    no-permission: "&c你没有权限使用此命令。"
+    players-only: "&c只有玩家可以使用此命令。"
+    economy-not-ready: "&c经济插件未加载或货币无效，请联系管理员。"
+    not-enough-money: "&c余额不足，需要 &e{cost} &c（当前：&e{balance}&c）。"
+    cooldown: "&c传送冷却中，请等待 &e{seconds} &c秒。"
+    searching: "&e正在寻找安全位置…"
+    delay-actionbar: "&e{seconds}&7秒 &8│ {cost_detail}"
+    delay-cost-free: "&7免费"
+    delay-cost-will-charge: "&7将扣 &e{cost}"
+    failed: "&c未找到合适位置，请稍后再试。"
+    success: "&a已传送到 &e{x}&a, &e{y}&a, &e{z}&a{paid}"
+    success-paid: " &7· &7已扣 &e{paid}"
+    world-denied: "&c此世界禁止使用随机传送。"
+    no-valid-range: "&c世界边界与配置范围无重叠，无法随机传送。"
+    reload-success: "&a配置已重载。"
+    reload-denied: "&c你没有权限重载配置。"
+    reload-failed: "&c重载失败，请查看控制台。"
+    reload-rtp-cancelled: "&7随机传送倒计时已取消：配置已重载。"
+    back-none: "&c没有可返回的上一次传送前位置。"
+    back-success: "&a已返回上一位置{paid}"
+    back-success-paid: " &7· &7已扣 &e{paid}"
+    delay-canceled: "&c传送已取消：移动或受到伤害。"
+    unknown-subcommand: "&c未知子命令。"
+    rtp-pending: "&c请等待当前随机传送完成。"
+    help-header: "&8&m-----&r &6&l随机传送 &8&m-----"
+    help-line-range: |-
+      &7>> &b{world} &8〔&7{dim}&8〕
+      &7  &f随机 &e{rtp} &8│ &f返回 &e{back}
+      &7  + &7范围 &fX &e{minx}&7-&e{maxx} &fZ &e{minz}&7-&e{maxz}
+    help-line-no-range: |-
+      &7>> &b{world} &8〔&7{dim}&8〕
+      &7  &f随机 &e{rtp} &8│ &f返回 &e{back}
+      &7  + &c无有效范围
+    help-footer: "&8--- &7/rtp &8· &7/rtp back &8· &7/rtp help"
+    help-dim-overworld: "主世界"
+    help-dim-nether: "下界"
+    help-dim-end: "末地"
+    help-no-permission: ""
+    help-no-worlds: "&7当前配置下没有可用于随机传送的世界。"
+  en:
+    prefix: "&7[&bRTP&7] &r"
+    no-permission: "&cYou don't have permission to use this command."
+    players-only: "&cOnly players can use this command."
+    economy-not-ready: "&cEconomy is not ready or currency is invalid. Contact staff."
+    not-enough-money: "&cNot enough balance. Need &e{cost}&c (you have &e{balance}&c)."
+    cooldown: "&cTeleport on cooldown. Wait &e{seconds} &cmore seconds."
+    searching: "&eFinding a safe spot…"
+    delay-actionbar: "&e{seconds}&7s &8│ {cost_detail}"
+    delay-cost-free: "&7Free"
+    delay-cost-will-charge: "&7Charge &e{cost}"
+    failed: "&cCould not find a safe location. Try again later."
+    success: "&aTeleported to &e{x}&a, &e{y}&a, &e{z}&a{paid}"
+    success-paid: " &7· &7Charged &e{paid}"
+    world-denied: "&cRandom teleport is disabled in this world."
+    no-valid-range: "&cWorld border does not overlap the configured RTP range."
+    reload-success: "&aConfiguration reloaded."
+    reload-denied: "&cYou don't have permission to reload."
+    reload-failed: "&cReload failed. See console for details."
+    reload-rtp-cancelled: "&7RTP countdown cancelled: configuration was reloaded."
+    back-none: "&cNo previous RTP location to return to."
+    back-success: "&aReturned to your previous location{paid}"
+    back-success-paid: " &7· &7Charged &e{paid}"
+    delay-canceled: "&cTeleport cancelled — you moved or took damage."
+    unknown-subcommand: "&cUnknown subcommand."
+    rtp-pending: "&cFinish your current random teleport first."
+    help-header: "&8&m-----&r &6&lRTP &8&m-----"
+    help-line-range: |-
+      &7>> &b{world} &8〔&7{dim}&8〕
+      &7  &fRTP &e{rtp} &8│ &fBack &e{back}
+      &7  + &7Area &fX &e{minx}&7-&e{maxx} &fZ &e{minz}&7-&e{maxz}
+    help-line-no-range: |-
+      &7>> &b{world} &8〔&7{dim}&8〕
+      &7  &fRTP &e{rtp} &8│ &fBack &e{back}
+      &7  + &cNo valid range
+    help-footer: "&8--- &7/rtp &8· &7/rtp back &8· &7/rtp help"
+    help-dim-overworld: "Overworld"
+    help-dim-nether: "Nether"
+    help-dim-end: "The End"
+    help-no-permission: ""
+    help-no-worlds: "&7No worlds allow RTP with the current config."
