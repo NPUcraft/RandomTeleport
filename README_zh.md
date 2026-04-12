@@ -87,6 +87,11 @@ mvn clean package
 | `%randomteleport_has_back%`  | `true` / `false`，是否存有可返回位置。                           |
 
 
+## 赞助
+
+欢迎支持本项目：[爱发电](https://www.ifdian.net/a/SUPER2FH?utm_source=copylink&utm_medium=link)。
+
+
 ## 开源协议
 
 本项目采用 **MIT License**（MIT 许可证）。完整条款见仓库根目录 [LICENSE](LICENSE) 文件。

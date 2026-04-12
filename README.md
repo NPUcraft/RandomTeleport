@@ -87,6 +87,11 @@ Registered expansion: `**randomteleport**`. Use **lowercase** identifiers; words
 | `%randomteleport_has_back%`  | `true` / `false` — stored return location exists.                                       |
 
 
+## Sponsor
+
+If you would like to support this project: [afdian.net / 爱发电](https://www.ifdian.net/a/SUPER2FH?utm_source=copylink&utm_medium=link).
+
+
 ## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
